@@ -2,7 +2,7 @@
 - name: Test vmware_rest
   hosts: localhost
   gather_facts: False
-  vars_files: vcenter_data.yml
+  vars_files: vcenter_data_ansible.yml
   tasks:
     - name: Check all existing VM
       vmware.vmware_rest.vcenter_vm_info:

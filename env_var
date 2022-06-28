@@ -1,4 +1,0 @@
- export VMWARE_HOST=mtyvcapac01.vmware.liverpool.com.mx
- export VMWARE_USER=fmonjarazf@vmware.liverpool.com.mx
- export VMWARE_PASSWORD=Pm-08036
- export VMWARE_VALIDATE_CERTS=no

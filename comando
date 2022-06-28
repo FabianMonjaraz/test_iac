@@ -1,1 +1,0 @@
-curl -s -k -u 'ansible@vmware.liverpool.com.mx':'L!v3rp00l' https://stfvcapac01.vmware.liverpool.com.mx/rest/com/vmware/vapi/metadata/cli/command | jq ".[][].path" 2>/dev/null | sort -u | wc -l
