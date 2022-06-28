@@ -1,0 +1,86 @@
+= Uso del modulo vmware_rest en ansible para obtencion de inventarios.
+:author: D. Fabian Monjaraz Flores
+:version: 1.0
+:date: 21/06/2022
+
+== Introduccion
+"vmware_rest" es un modulo para la integracion entre vcenter y ansible. Aprovecha la interface API/REST de vCenter, el cual, desde la version 6.3, ya tiene este tipo de comunicaciones
+
+Este modulo, aunque puede utilizarse para la manipulacion de los componentes de vCenter, sera utilizado para obtener la informacion de las maquinas virtuales:
+
+* Ip(s)
+* Hostname
+* Memoria RAM, S.O.
+* Numero de CPUS
+* Tipo de Sistema Operativo
+* Entre otros
+
+== Requerimientos
+Para que vmware_rest pueda funcionar, estos son los prerequisitos
+
+* vCenter 7.0 o mayor
+** Usuario y password del vcenter
+* Python >= 3.6
+* Ansible >= 2.6
+* aiohttp
+
+== Instalacion
+=== Instalacion de aiohttp
+Esta instalacion puede hacerse de dos maneras, desde pip o desde el manejador de paquetes.
+
+[source,bash]
+yum install -y python38-aiohttp
+
+[source,python]
+pip3 install aiohttp
+
+=== Instalacion del modulo vmware_rest
+Ejecutamos el siguiente comando para obtener la coleccion de vmware_rest
+
+[source,bash]
+ansible-galaxy collect install vmware.vmware_rest
+
+== Configuracion inicial
+.Antes de configurar Ansible
+Antes de iniciar las configuraciones del ambiente de ansible, es recomendable probar las credenciales y verificar si estas son validas para acceder al vCenter.
+
+Para esto, puede utilizarse `curl` con el usuario, contraseña y la opcion `-k` por si los certificados ssl no estan correctamente definidos
+
+[source,bash]
+curl -s -k -u <USUARIO_VCENTER>:<PASSWORD_VCENTER> http://<HOSTNAME_VCENTER>/rest/com/vmware/vapi/matadata/cli/command | jq ".[][].path" 2>/dev/null | sort -u | wc -l
+
+Si el comando anterior arroja un valor diferente de cero, entonces las credenciales son idoneas para utilizarse en ansible
+
+=== Definir las variables de entorno
+Aunque pueden definirse dentro del propio playbook, es recomendable definir variables de entorno que establezcan el hostname del vCenter, las credenciales y el manejo de los certificados de seguridad.
+
+.Variables definidas en un archivo "env_var"
+[source,bash]
+export VMWARE_HOST=<HOSTNAME_VCENTER>
+export VMWARE_USER=<USUARIO_VCENTER>
+export VMWARE_PASSWORD=<PASSWORD_VCENTER>
+export VMWARE_VALIDATE_CERTS=no
+
+Una vez definidas las variables, se ejecuta el comando `source` sobre el archivo
+[source,bash]
+source ./env_var
+
+== Prueba del vmware_rest
+Una vez realizada la configuracion inicial, ya es posible empezar a armar el playbook de recoleccion de informacion desde el vCenter.
+
+Cabe destacar que el host del playbook *no* es el vCenter. Este puede ser cualquiera, incluyendo localhost. Como llegar y como acceder al vCenter se definio en las variables de entorno.
+
+Aqui un ejemplo de un playbook para probar vmware_rest
+
+[source,yaml]
+---
+- name: Test vmware_rest
+  hosts: localhost
+  gather_facts: False
+  tasks:
+    - name: Check all existing VM
+      vmware.vmware_rest.vcenter_vm_info:
+      register: existing_vms
+    - debug:
+        var: "existing_vms"
+...
