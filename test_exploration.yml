@@ -1,0 +1,17 @@
+---
+- name: Test vmware_rest
+  hosts: localhost
+  gather_facts: False
+  vars_files: vcenter_data.yml
+  tasks:
+    - name: Check all existing VM
+      vmware.vmware_rest.vcenter_vm_info:
+        vcenter_hostname: "{{ mty_vcenter_hostname }}"
+        vcenter_username: "{{ mty_vcenter_username }}"
+        vcenter_password: "{{ mty_vcenter_password }}"
+        vcenter_validate_certs: False
+      register: existing_vms
+      until: existing_vms is not failed
+    - debug:
+        var: "existing_vms"
+...

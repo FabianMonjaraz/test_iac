@@ -1,0 +1,13 @@
+---
+- name: Test vmware_rest
+  hosts: localhost
+  gather_facts: False
+  
+  tasks:
+    - name: Check all existing VM
+      vmware.vmware_rest.vcenter_vm_info:
+      register: existing_vms
+      #until: existing_vms is not failed
+    - debug:
+        msg: "{{ existing_vms | json_query('[*]') }}"
+...
