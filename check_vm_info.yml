@@ -2,12 +2,21 @@
 - name: Test vmware_rest
   hosts: localhost
   gather_facts: False
-  
+  vars_files: vcenter_data_ansible.yml
+  environment:
+    VMWARE_HOST: "{{ stf_vcenter_hostname }}"
+    VMWARE_USER: "{{ vcenter_username }}"
+    VMWARE_PASSWORD: "{{ vcenter_password }}"
+    VMWARE_VALIDATE_CERTS: no
   tasks:
     - name: Check all existing VM
       vmware.vmware_rest.vcenter_vm_info:
       register: existing_vms
-      #until: existing_vms is not failed
-    - debug:
-        msg: "{{ existing_vms | json_query('[*]') }}"
+      until: existing_vms is not failed
+
+    - name: Retriving full vm info.
+      vmware.vmware_rest.vcenter_vm_info:
+        vm: "{{ item }}"
+      loop: "{{ existing_vms.value | json_query('[*].vm') }}"
+      register: full_vm_info
 ...

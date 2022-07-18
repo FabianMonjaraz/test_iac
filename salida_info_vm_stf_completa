@@ -1,0 +1,12 @@
+
+PLAY [Test vmware_rest] ********************************************************
+
+TASK [Adding temp. data] *******************************************************
+changed: [localhost]
+
+TASK [Reading exported vars from ~/.bashrc] ************************************
+changed: [localhost]
+
+TASK [Check all existing VM] ***************************************************
+FAILED - RETRYING: [localhost]: Check all existing VM (3 retries left).
+FAILED - RETRYING: [localhost]: Check all existing VM (2 retries left).
